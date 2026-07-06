@@ -1,0 +1,99 @@
+from fastapi import HTTPException
+from sqlalchemy.orm import Session
+
+from app.models.pagos import Pago
+from app.models.pedidos import Pedido
+from app.schemas.pagos import PagoCreate
+
+
+def obtener_pagos(db: Session):
+    return db.query(Pago).all()
+
+
+def obtener_pago(db: Session, pago_id: int):
+    pago = db.query(Pago).filter(
+        Pago.id == pago_id
+    ).first()
+
+    if not pago:
+        raise HTTPException(
+            status_code=404,
+            detail="Pago no encontrado"
+        )
+
+    return pago
+
+
+def crear_pago(db: Session, pago: PagoCreate):
+
+    pedido = db.query(Pedido).filter(
+        Pedido.id == pago.pedido_id
+    ).first()
+
+    if not pedido:
+        raise HTTPException(
+            status_code=404,
+            detail="Pedido no encontrado"
+        )
+
+    existe = db.query(Pago).filter(
+        Pago.pedido_id == pago.pedido_id
+    ).first()
+
+    if existe:
+        raise HTTPException(
+            status_code=400,
+            detail="Ese pedido ya tiene un pago registrado"
+        )
+
+    nuevo_pago = Pago(
+        pedido_id=pago.pedido_id,
+        metodo_pago=pago.metodo_pago,
+        total=pago.total
+    )
+
+    db.add(nuevo_pago)
+    db.commit()
+    db.refresh(nuevo_pago)
+
+    return nuevo_pago
+
+
+def actualizar_pago(
+    db: Session,
+    pago_id: int,
+    datos: PagoCreate
+):
+
+    pago = obtener_pago(db, pago_id)
+
+    pedido = db.query(Pedido).filter(
+        Pedido.id == datos.pedido_id
+    ).first()
+
+    if not pedido:
+        raise HTTPException(
+            status_code=404,
+            detail="Pedido no encontrado"
+        )
+
+    pago.pedido_id = datos.pedido_id
+    pago.metodo_pago = datos.metodo_pago
+    pago.total = datos.total
+
+    db.commit()
+    db.refresh(pago)
+
+    return pago
+
+
+def eliminar_pago(db: Session, pago_id: int):
+
+    pago = obtener_pago(db, pago_id)
+
+    db.delete(pago)
+    db.commit()
+
+    return {
+        "message": "Pago eliminado correctamente"
+    }
