@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Café Control - Administración</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+
+    <div class="sidebar">
+
+        <div class="sidebar-top">
+
+            <h2>Café Control</h2>
+
+            <div class="nav-group">
+
+                <button class="nav-btn active" onclick="switchTab('panel-inicio', this)">
+                    Inicio
+                </button>
+
+                <button class="nav-btn" onclick="switchTab('panel-users', this)">
+                    Usuarios
+                </button>
+
+                <button class="nav-btn" onclick="switchTab('panel-stats', this)">
+                    Estadísticas
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="sidebar-footer">
+
+            <div class="profile-box">
+
+                <div class="avatar">
+                    A
+                </div>
+
+                <div class="profile-info">
+                    <h4>Admin</h4>
+                    <p>Administrador</p>
+                </div>
+
+            </div>
+
+            <button class="btn-logout">
+                Cerrar Sesión
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="content">
+
+        <div id="panel-inicio" class="tab-panel active">
+
+            <div class="top-header">
+                <h1>Inicio</h1>
+            </div>
+
+            <div class="grid-metrics">
+
+                <div class="metric-card">
+
+                    <div class="metric-header">
+                        <span class="metric-title">
+                            Ventas Totales
+                        </span>
+                    </div>
+
+                    <div class="metric-value" id="lbl-total-sales">
+                        $0.00
+                    </div>
+
+                    <div class="metric-sub sub-up">
+                        12.5% vs mes anterior
+                    </div>
+
+                </div>
+
+                <div class="metric-card">
+
+                    <div class="metric-header">
+                        <span class="metric-title">
+                            Ganancias
+                        </span>
+                    </div>
+
+                    <div class="metric-value">
+                        $8,320
+                    </div>
+
+                    <div class="metric-sub sub-up">
+                        8.3% vs mes anterior
+                    </div>
+
+                </div>
+
+                <div class="metric-card">
+
+                    <div class="metric-header">
+                        <span class="metric-title">
+                            Gastos
+                        </span>
+                    </div>
+
+                    <div class="metric-value">
+                        $4,130
+                    </div>
+
+                    <div class="metric-sub sub-down">
+                        3.2% vs mes anterior
+                    </div>
+
+                </div>
+
+                <div class="metric-card">
+
+                    <div class="metric-header">
+                        <span class="metric-title">
+                            Pedidos
+                        </span>
+                    </div>
+
+                    <div class="metric-value" id="lbl-active-orders">
+                        0
+                    </div>
+
+                    <div class="metric-sub sub-up">
+                        15 pedidos hoy
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+                <div id="panel-users" class="tab-panel">
+
+            <div class="top-header">
+                <h1>Gestión de Usuarios</h1>
+            </div>
+
+            <div class="filter-bar">
+
+                <div class="filter-group">
+                    <label>Rol</label>
+
+                    <select class="select-control">
+                        <option>Todos</option>
+                        <option>Administrador</option>
+                        <option>Mesero</option>
+                        <option>Cocina</option>
+                        <option>Caja</option>
+                    </select>
+
+                </div>
+
+                <div class="filter-group">
+
+                    <label>Estado</label>
+
+                    <select class="select-control">
+                        <option>Todos</option>
+                        <option>Activo</option>
+                        <option>Inactivo</option>
+                    </select>
+
+                </div>
+
+                <button class="btn-reset">
+                    Resetear
+                </button>
+
+                <a href="#" class="btn-action">
+                    Excel
+                </a>
+
+            </div>
+
+            <div class="action-row">
+
+                <div class="search-box">
+                    <input type="text" placeholder="Buscar usuario...">
+                </div>
+
+                <button
+                    class="btn-action btn-action-primary"
+                    onclick="openModal()">
+
+                    + Nuevo Usuario
+
+                </button>
+
+            </div>
+
+            <table class="table-users">
+
+                <thead>
+
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Correo</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="table-users-body">
+
+                </tbody>
+
+            </table>
+
+            <div id="modal-user" class="modal">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+
+                        <h3>Nuevo Empleado</h3>
+
+                        <span
+                            class="close-modal"
+                            onclick="closeModal()">
+
+                            &times;
+
+                        </span>
+
+                    </div>
+
+                    <form id="form-add-user">
+
+                        <div class="form-group" style="margin-top:15px;">
+
+                            <label style="display:block;margin-bottom:5px;font-size:.8rem;font-weight:700;color:#7a706a;text-transform:uppercase;">
+
+                                Nombre de Usuario
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="txt-username"
+                                class="input-control"
+                                placeholder="Ej. mesero_luis"
+                                required>
+
+                        </div>
+
+                        <div class="form-group" style="margin-top:15px;">
+
+                            <label style="display:block;margin-bottom:5px;font-size:.8rem;font-weight:700;color:#7a706a;text-transform:uppercase;">
+
+                                Asignar Rol
+
+                            </label>
+
+                            <select
+                                id="sel-role"
+                                class="select-control">
+
+                                <option value="Administrador">
+                                    Administrador
+                                </option>
+
+                                <option value="Mesero">
+                                    Mesero
+                                </option>
+
+                                <option value="Cocina">
+                                    Cocina
+                                </option>
+
+                                <option value="Caja">
+                                    Caja
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div style="margin-top:25px;display:flex;justify-content:flex-end;gap:10px;">
+
+                            <button
+                                type="button"
+                                class="btn-action"
+                                onclick="closeModal()">
+
+                                Cancelar
+
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="btn-action btn-action-primary">
+
+                                Guardar Empleado
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+                <div id="panel-stats" class="tab-panel">
+
+            <div class="top-header">
+
+                <h1>Estadísticas y Reportes</h1>
+
+                <div>
+
+                    <a
+                        href="/api/stats/report/pdf"
+                        class="btn-action"
+                        style="margin-right:8px;">
+
+                        PDF
+
+                    </a>
+
+                    <a
+                        href="/api/stats/report/excel"
+                        class="btn-action">
+
+                        Excel
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="filter-bar">
+
+                <div class="filter-group">
+
+                    <label>Período</label>
+
+                    <select class="select-control">
+                        <option>Esta Semana</option>
+                        <option>Este Mes</option>
+                    </select>
+
+                </div>
+
+                <div class="filter-group">
+
+                    <label>Categoría</label>
+
+                    <select class="select-control">
+                        <option>Todas</option>
+                    </select>
+
+                </div>
+
+                <button class="btn-reset">
+                    Resetear
+                </button>
+
+            </div>
+
+            <div class="charts-row">
+
+                <div class="chart-card">
+
+                    <h3>Gastos Diarios</h3>
+
+                    <canvas id="chart-products"></canvas>
+
+                </div>
+
+                <div class="chart-card">
+
+                    <h3>Ganancias Diarias</h3>
+
+                    <canvas id="chart-status"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+</body>
+
+</html>

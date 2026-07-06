@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.models.pagos import Pago
 from app.models.pedidos import Pedido
+from app.models.ventas import Venta
 from app.schemas.pagos import PagoCreate
 
 
@@ -46,6 +47,7 @@ def crear_pago(db: Session, pago: PagoCreate):
             detail="Ese pedido ya tiene un pago registrado"
         )
 
+    # Crear pago
     nuevo_pago = Pago(
         pedido_id=pago.pedido_id,
         metodo_pago=pago.metodo_pago,
@@ -55,6 +57,23 @@ def crear_pago(db: Session, pago: PagoCreate):
     db.add(nuevo_pago)
     db.commit()
     db.refresh(nuevo_pago)
+
+    # Crear venta automáticamente
+    try:
+        nueva_venta = Venta(
+            pago_id=nuevo_pago.id,
+            folio=f"V-{nuevo_pago.id}"
+        )
+
+        db.add(nueva_venta)
+        db.commit()
+        db.refresh(nueva_venta)
+
+        print("VENTA CREADA:", nueva_venta.id)
+
+    except Exception as e:
+        db.rollback()
+        print("ERROR AL CREAR VENTA:", e)
 
     return nuevo_pago
 
